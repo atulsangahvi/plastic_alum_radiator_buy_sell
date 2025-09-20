@@ -304,10 +304,6 @@ sales_m = (
 )
 
 purch_m = purch.assign(_month=purch[col_date_p].dt.to_period("M").dt.to_timestamp()) \
-    .groupby([col_item_p, "_month"]).agg(
-        qty_p=(col_qty_p, "sum"),
-        spend=(col_cost, lambda s: float((s * 0 + 1).rename("ones")))  # dummy to allow next line
-    ).reset_index().rename(columns={col_item_p: col_item})
 # Correct spend with true line-level computation on original purch df
 purch["line_spend"] = purch[col_qty_p] * purch[col_cost]
 purch_m = purch.assign(_month=purch[col_date_p].dt.to_period("M").dt.to_timestamp()) \
