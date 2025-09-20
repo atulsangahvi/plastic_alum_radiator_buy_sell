@@ -30,11 +30,11 @@ def load_excel_from_buffer(buf) -> Dict[str, pd.DataFrame]:
         data[s] = pd.read_excel(buf, sheet_name=s)
     return data
 
-def coalesce_cols(df: pd.DataFrame, candidates: Tuple[str, ...]) -> str:
+def coalesce_cols(df: pd.DataFrame, candidates: Tuple[str, ...]) -> str | None:
     for c in candidates:
         if c in df.columns:
             return c
-    return candidates[0]
+    return None
 
 def simple_exp_smooth(x: np.ndarray, alpha: float = 0.3) -> np.ndarray:
     if len(x) == 0:
@@ -134,7 +134,8 @@ sales.columns = [c.strip() for c in sales.columns]
 
 # Key columns
 def pick(df, *names):
-    return coalesce_cols(df, names)
+    col = coalesce_cols(df, names)
+    return col
 
 col_item_p = pick(purch, "Item Number", "Item", "SKU", "Product Code")
 col_item_s = pick(sales, "Item Number", "Item", "SKU", "Product Code")
@@ -152,7 +153,47 @@ col_amt = "Amount" if "Amount" in sales.columns else pick(sales, "Net Amount", "
 col_vendor = "Vendor Name" if "Vendor Name" in purch.columns else pick(purch, "Vendor", "Supplier")
 col_customer = "Customer Name" if "Customer Name" in sales.columns else pick(sales, "Customer", "Cust Name")
 
-col_product_name = "Product Name" if "Product Name" in sales.columns else col_item_s
+col_product_name = \"Product Name\" if \"Product Name\" in sales.columns else col_item_s
+# Schema diagnostics
+required_sales = {
+    "Item": (col_item_s, ("Item Number","Item","SKU","Product Code")),
+    "Date": (col_date_s, ("Date","Posting Date","Invoice Date")),
+    "Quantity": (col_qty_s, ("Quantity","Qty","QTY")),
+    "Amount": (col_amt, ("Amount","Net Amount","Line Amount")),
+}
+required_purch = {
+    "Item": (col_item_p, ("Item Number","Item","SKU","Product Code")),
+    "Date": (col_date_p, ("Date","Posting Date","Invoice Date")),
+    "Quantity": (col_qty_p, ("Quantity","Qty","QTY")),
+    "Unit Cost": (col_cost, ("Unit Price","Unit Cost","Cost","UnitPrice")),
+}
+
+missing_msgs = []
+for label, (found, candidates) in required_sales.items():
+    if found is None:
+        missing_msgs.append(f"Sales sheet missing **{label}**. Expected one of: {', '.join(candidates)}")
+
+for label, (found, candidates) in required_purch.items():
+    if found is None:
+        missing_msgs.append(f"Purchases sheet missing **{label}**. Expected one of: {', '.join(candidates)}")
+
+with st.expander("🔧 Schema diagnostics (click to expand)"):
+    st.write("**Sales columns found:**", list(sales.columns))
+    st.write("**Purchases columns found:**", list(purch.columns))
+    st.write("**Key column mapping (None = not found):**")
+    st.json({
+        "Sales": {"Item": col_item_s, "Date": col_date_s, "Quantity": col_qty_s, "Amount": col_amt, "Customer": col_customer, "ProductName": col_product_name},
+        "Purchases": {"Item": col_item_p, "Date": col_date_p, "Quantity": col_qty_p, "UnitCost": col_cost, "Vendor": col_vendor}
+    })
+
+if missing_msgs:
+    st.error("I couldn't find some required columns. Please rename columns in your Excel or use the 'Upload' option.
+
+" + "
+
+".join(missing_msgs))
+    st.stop()
+
 col_invoice_s = pick(sales, "Invoice", "Invoice No", "Invoice Number", "Sales Invoice")
 
 # Types
