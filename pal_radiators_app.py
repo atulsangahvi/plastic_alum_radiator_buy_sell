@@ -187,7 +187,7 @@ with st.expander("🔧 Schema diagnostics (click to expand)"):
     })
 
 if missing_msgs:
-    st.error("I couldn't find some required columns. Please rename columns in your Excel or use the 'Upload' option.
+    st.error("I couldn't find some required columns. Please rename columns in your Excel or use the Upload option.
 
 " + "
 
