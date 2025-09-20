@@ -187,11 +187,7 @@ with st.expander("🔧 Schema diagnostics (click to expand)"):
     })
 
 if missing_msgs:
-    st.error("I couldn't find some required columns. Please rename columns in your Excel or use the Upload option.
-
-" + "
-
-".join(missing_msgs))
+    st.error("I couldn\'t find some required columns. Please rename columns in your Excel or use the Upload option.\n\n" + "\n\n".join(missing_msgs))
     st.stop()
 
 col_invoice_s = pick(sales, "Invoice", "Invoice No", "Invoice Number", "Sales Invoice")
