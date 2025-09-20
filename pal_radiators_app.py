@@ -153,7 +153,7 @@ col_amt = "Amount" if "Amount" in sales.columns else pick(sales, "Net Amount", "
 col_vendor = "Vendor Name" if "Vendor Name" in purch.columns else pick(purch, "Vendor", "Supplier")
 col_customer = "Customer Name" if "Customer Name" in sales.columns else pick(sales, "Customer", "Cust Name")
 
-col_product_name = \"Product Name\" if \"Product Name\" in sales.columns else col_item_s
+col_product_name = "Product Name" if "Product Name" in sales.columns else col_item_s
 # Schema diagnostics
 required_sales = {
     "Item": (col_item_s, ("Item Number","Item","SKU","Product Code")),
