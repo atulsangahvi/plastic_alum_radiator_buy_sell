@@ -138,7 +138,7 @@ def pick(df, *names):
     return col
 
 col_item_p = pick(purch, "Item Number", "Item", "SKU", "Product Code")
-col_item_s = pick(sales, "Item Number", "Item", "SKU", "Product Code")
+col_item_s = pick(sales, "Item Number", "Item", "SKU", "Product Code", "ItemCode", "Item Code", "Item No", "ItemNo")
 col_item = col_item_p
 
 col_date_p = pick(purch, "Date", "Posting Date", "Invoice Date")
@@ -156,13 +156,13 @@ col_customer = "Customer Name" if "Customer Name" in sales.columns else pick(sal
 col_product_name = "Product Name" if "Product Name" in sales.columns else col_item_s
 # Schema diagnostics
 required_sales = {
-    "Item": (col_item_s, ("Item Number","Item","SKU","Product Code")),
+    "Item": (col_item_s, ("Item Number","Item","SKU","Product Code","ItemCode","Item Code","Item No","ItemNo")),
     "Date": (col_date_s, ("Date","Posting Date","Invoice Date")),
     "Quantity": (col_qty_s, ("Quantity","Qty","QTY")),
     "Amount": (col_amt, ("Amount","Net Amount","Line Amount")),
 }
 required_purch = {
-    "Item": (col_item_p, ("Item Number","Item","SKU","Product Code")),
+    "Item": (col_item_p, ("Item Number","Item","SKU","Product Code","ItemCode","Item Code","Item No","ItemNo")),
     "Date": (col_date_p, ("Date","Posting Date","Invoice Date")),
     "Quantity": (col_qty_p, ("Quantity","Qty","QTY")),
     "Unit Cost": (col_cost, ("Unit Price","Unit Cost","Cost","UnitPrice")),
